@@ -8,6 +8,7 @@
 [![Python](https://img.shields.io/badge/Python-3.9%2B-3776AB?logo=python&logoColor=white)](requirements.txt)
 [![PyTorch](https://img.shields.io/badge/PyTorch-2.x-EE4C2C?logo=pytorch&logoColor=white)](requirements.txt)
 [![License: MIT](https://img.shields.io/badge/License-MIT-2ea44f.svg)](LICENSE)
+[![Datos: CC BY 4.0](https://img.shields.io/badge/datos-CC%20BY%204.0-lightgrey.svg)](DATA_LICENSE.md)
 [![Model Card](https://img.shields.io/badge/Model%20Card-disponible-b23a2b)](MODEL_CARD.md)
 ![Estado](https://img.shields.io/badge/estado-educativo%20%C2%B7%20sin%20validez%20cl%C3%ADnica-critical)
 
@@ -389,7 +390,8 @@ IAMED/
 ├── README.md            # Este documento
 ├── MODEL_CARD.md        # Ficha del modelo: uso previsto, sesgos, limitaciones
 ├── requirements.txt     # Dependencias mínimas reproducibles
-├── LICENSE              # MIT para el código (los datos tienen su propia licencia)
+├── LICENSE              # MIT para el código
+├── DATA_LICENSE.md      # Licencia de los datos (MedMNIST, CC BY 4.0)
 ├── .gitignore           # Artefactos, checkpoints y datos descargados
 ├── results/
 │   └── metrics.json     # Todas las métricas del cuaderno, legibles por máquina
@@ -412,8 +414,9 @@ originales del conjunto de datos:
 
 - **Autor del cuaderno:** Abdieel Camargo ([@abdiellzz](https://github.com/abdiellzz)).
 - **Código:** licencia MIT ([`LICENSE`](LICENSE)).
-- **Datos:** licencia propia de MedMNIST (CC BY 4.0 para el conjunto agregado; cada subconjunto
-  conserva la licencia de su publicación original). **No** cubiertos por la MIT del repositorio.
+- **Datos:** licencia propia de MedMNIST (CC BY 4.0; cada subconjunto conserva la de su
+  publicación original). **No** cubiertos por la MIT del repositorio. Detalle en
+  [`DATA_LICENSE.md`](DATA_LICENSE.md).
 
 <div align="center">
 

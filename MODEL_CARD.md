@@ -37,7 +37,7 @@ autoridad sanitaria) ni validación clínica prospectiva de ningún tipo.
 | **Etiquetas** | 0 = `normal`, 1 = `pneumonia` |
 | **Tamaños** | train 4 708 · val 524 · test 624 |
 | **Desbalance (test)** | 234 normal / 390 neumonía (modelo trivial: exactitud 0.625) |
-| **Licencia de los datos** | MedMNIST: CC BY 4.0; cada subconjunto conserva la licencia de su fuente original. Ver `LICENSE`. |
+| **Licencia de los datos** | MedMNIST: CC BY 4.0; cada subconjunto conserva la licencia de su fuente original. Ver [`DATA_LICENSE.md`](DATA_LICENSE.md). |
 | **Sesgos conocidos** | Un único origen y periodo; no se analiza sesgo por edad, sexo, equipo o centro |
 
 Las imágenes están reducidas a 28 × 28 píxeles, lo que **elimina prácticamente toda la
