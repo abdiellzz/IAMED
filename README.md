@@ -1,233 +1,350 @@
-# Clasificador de radiografías pediátricas con PyTorch (MedMNIST) — proyecto educativo
+<div align="center">
+
+# Clasificador de radiografías pediátricas con PyTorch
+
+### MedMNIST · CNN + AutoML (Optuna) + ResNet-18 · evaluación estadística honesta
 
 [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/abdiellzz/IAMED/blob/main/IAdoc.ipynb)
-![Python](https://img.shields.io/badge/Python-3.9%2B-blue)
-![PyTorch](https://img.shields.io/badge/PyTorch-2.x-EE4C2C)
-![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)
+[![Python](https://img.shields.io/badge/Python-3.9%2B-3776AB?logo=python&logoColor=white)](requirements.txt)
+[![PyTorch](https://img.shields.io/badge/PyTorch-2.x-EE4C2C?logo=pytorch&logoColor=white)](requirements.txt)
+[![License: MIT](https://img.shields.io/badge/License-MIT-2ea44f.svg)](LICENSE)
+[![Model Card](https://img.shields.io/badge/Model%20Card-disponible-b23a2b)](MODEL_CARD.md)
+![Estado](https://img.shields.io/badge/estado-educativo%20%C2%B7%20sin%20validez%20cl%C3%ADnica-critical)
 
-> ##  No tiene validez clínica
-> Este repositorio es un **ejercicio educativo y retrospectivo**. Los modelos aquí
-> descritos **no son dispositivos médicos**, **no están validados** y **no deben usarse
-> para diagnosticar, descartar ni priorizar** a ningún paciente. Se entrenan con
-> imágenes de **28 × 28 píxeles** procedentes de un único conjunto de datos público,
-> sin validación externa ni prospectiva.
->
-> Ficha completa de uso, sesgos y limitaciones: [`MODEL_CARD.md`](MODEL_CARD.md)
+</div>
 
----
-
-## Qué es esto (resumen en 60 segundos)
-
-Clasificador binario (**normal** vs **neumonía**) sobre **PneumoniaMNIST** (MedMNIST v2),
-un conjunto de radiografías de tórax **pediátricas** reducidas a 28 × 28 píxeles en
-escala de grises.
-
-Se comparan **cuatro enfoques** bajo el mismo split oficial (n = 624 en prueba):
-
-1. CNN pequeña entrenada desde cero.
-2. La misma CNN con **pérdida ponderada** por desbalance de clases.
-3. **AutoML** (búsqueda bayesiana de hiperparámetros con Optuna/TPE + pruning).
-4. **ResNet-18 preentrenada en ImageNet** con ajuste fino (*transfer learning*).
-
-Además de las métricas, el cuaderno incluye lo que suele faltar en los portafolios:
-**intervalos de confianza por bootstrap**, **test exacto de McNemar** con corrección de
-Bonferroni, **intervalos de semilla** (3 ejecuciones) y una discusión explícita de los
-fallos metodológicos encontrados.
-
-| | |
-|---|---|
-| **Datos** | PneumoniaMNIST (MedMNIST v2) — train 4 708 · val 524 · test 624 |
-| **Tarea** | Clasificación binaria (`normal` = 0, `neumonía` = 1) |
-| **Desbalance en test** | 234 normal / 390 neumonía → un modelo trivial que siempre diga "neumonía" acierta **0.625** |
-| **Modelo CNN** | 240 962 parámetros |
-| **Modelo ResNet-18** | 11 171 266 parámetros (todas entrenables, ajuste fino) |
-| **Entorno de ejecución** | Google Colab, GPU Tesla T4, 15 épocas por corrida |
-| **Reproducibilidad** | Semilla fija (42), `cudnn.deterministic=True`, split oficial de MedMNIST |
+> [!CAUTION]
+> ### ⚠️ No tiene validez clínica
+> Este repositorio es un **ejercicio educativo y retrospectivo**. Los modelos **no son
+> dispositivos médicos**, no están validados, y **no deben usarse para diagnosticar,
+> descartar ni priorizar** a ningún paciente. Las imágenes se reducen a **28 × 28 píxeles**
+> y proceden de un único conjunto de datos público, sin validación externa ni prospectiva.
+> Ficha completa: [`MODEL_CARD.md`](MODEL_CARD.md).
 
 ---
 
-## Resultados
+## 📋 Qué es esto, en 60 segundos
 
-Conjunto de **prueba** (n = 624). Exactitud balanceada con **umbral fijo u = 0.50**.
-Intervalos de confianza al 95 % por **bootstrap** (2 000 remuestras sobre el conjunto de
-prueba). Todos los valores están copiados de las salidas reales del cuaderno
-(`IAdoc.ipynb`, celdas 37 y 38).
+<table>
+<tr>
+<td width="50%" valign="top">
 
-| Modelo | AUC | Exact. bal. (u = 0.50) | IC 95 % bootstrap |
-|---|---|---|---|
-| CNN base | 0.959 | 0.781 | [0.750 – 0.813] |
-| CNN + pesos | 0.968 | 0.848 | [0.818 – 0.878] |
-| AutoML (Optuna) | 0.969 | 0.892 | [0.866 – 0.918] |
-| ResNet-18 | **0.976** | 0.869 | [0.841 – 0.897] |
+**El problema**
 
-> Nota de transparencia: el cuaderno imprime **0.868** para ResNet-18 en su sección propia
-> (celda 35) y **0.869** en la comparativa final (celda 37). Esta tabla usa la salida de la
-> comparativa final, que es también la que alimenta el bootstrap y McNemar; la diferencia de
-> una milésima proviene de las dos salidas del cuaderno y no se ha retocado.
+Clasificar radiografías de tórax **pediátricas** en `normal` vs `neumonía`, usando
+**PneumoniaMNIST** (MedMNIST v2): imágenes de 28 × 28 píxeles en escala de grises.
 
-**Prueba exacta de McNemar** (mismo conjunto de prueba, u = 0.50):
+**Los datos**
 
-| Comparación | Aciertos solo A | Aciertos solo B | p-valor | Conclusión |
-|---|---|---|---|---|
-| AutoML vs ResNet-18 | 22 | 14 | **0.2430** | No significativo |
-| CNN + pesos vs ResNet-18 | 13 | 23 | **0.1325** | No significativo |
-| AutoML vs CNN + pesos | 24 | 6 | **0.0014** | Significativo (también con Bonferroni α = 0.0167) |
+| Split | Imágenes |
+|---|---:|
+| train | 4 708 |
+| val | 524 |
+| **test** | **624** |
 
-![Curvas ROC comparativas en el conjunto de prueba](docs/fig_roc_comparativa.png)
+Desbalance en test: **234 normal / 390 neumonía** → un modelo que siempre diga "neumonía"
+acierta **0.625**. Por eso la métrica principal es la **exactitud balanceada**, no la exactitud.
 
-*Curvas ROC de los cuatro modelos sobre las mismas 624 imágenes de prueba. Las AUC están
-comprimidas en la esquina superior izquierda: a esta resolución las cuatro curvas son casi
-indistinguibles, que es exactamente la conclusión del trabajo (los IC 95 % se solapan).*
+</td>
+<td width="50%" valign="top">
 
-![Matriz de confusión de la CNN base](docs/fig_matriz_confusion.png)
+**Los cuatro modelos comparados**
 
-*Matriz de confusión de la CNN base (u = 0.50). Los 102 falsos positivos frente a 1 solo
-falso negativo explican su especificidad de 0.564 y por qué la exactitud balanceada es la
-métrica principal, no la exactitud.*
+| # | Modelo | Idea |
+|---|---|---|
+| 1 | **CNN base** | Desde cero, 240 962 parámetros |
+| 2 | **CNN + pesos** | Pérdida ponderada por desbalance |
+| 3 | **AutoML** | Optuna/TPE, 25 pruebas, pruning |
+| 4 | **ResNet-18** | ImageNet + ajuste fino, 11,2 M parámetros |
 
-### Métricas complementarias (CNN, u = 0.50, prueba)
+**Lo que hace distinto este repositorio**
 
-| Modelo | Exactitud | Sensibilidad | Especificidad | F1 | Brier (↓ mejor) |
-|---|---|---|---|---|---|
-| CNN base | 0.835 | 0.997 | 0.564 | 0.883 | 0.1326 |
-| CNN + pesos | 0.883 | 0.987 | 0.709 | — | 0.0964 |
+No es "entrené una CNN y salió 97%". Incluye **intervalos de confianza por bootstrap**,
+**test exacto de McNemar** con Bonferroni, **variabilidad entre semillas** y una discusión
+explícita de **cuándo el modelo falla y por qué**.
 
-> Lectura honesta de la CNN base: con u = 0.50 tiene una sensibilidad del 99.7 % y una
-> especificidad del 56.4 %. Es decir, **casi todo lo clasifica como neumonía**; su
-> exactitud (0.835) es solo 21 puntos mejor que la del clasificador trivial (0.625).
-> Por eso la métrica principal del proyecto es la **exactitud balanceada**, no la exactitud.
-
-### Variabilidad entre semillas (CNN, 3 semillas: 42, 7, 123)
-
-| Configuración | AUC | Exact. bal. (u = 0.50) | Exact. bal. (umbral óptimo en val) |
-|---|---|---|---|
-| Sin pesos | 0.966 ± 0.005 | 0.781 ± 0.016 | 0.846 ± 0.016 |
-| Con pesos | 0.967 ± 0.005 | 0.829 ± 0.018 | 0.853 ± 0.021 |
-
-La desviación típica entre semillas (**≈ ± 0.02**) es del mismo orden que las diferencias
-que se pretenden interpretar entre modelos.
-
-### Trazabilidad de las cifras
-
-Cada número de este README proviene de una salida del cuaderno, no de una estimación:
-
-| Cifra | Celda del cuaderno |
-|---|---|
-| Tamaños de split y desbalance | 8, 12 |
-| Métricas de la CNN base (exactitud, sens., espec., F1) | 20 |
-| AUC y umbrales de validación | 25 |
-| Comparación CNN sin/con pesos, umbral óptimo | 26 |
-| Brier score y calibración | 27 |
-| Variabilidad entre semillas | 28 |
-| Optuna, hiperparámetros ganadores y métricas finales | 31 |
-| ResNet-18 (AUC, bal. a u = 0.50 y u = 0.33) | 35 |
-| Tabla comparativa + IC 95 % bootstrap | 37 |
-| Test de McNemar | 38 |
-
-(Los índices corresponden a `IAdoc.ipynb` tal como está en este repositorio, contando la
-celda Markdown de cabecera como celda 0.)
+</td>
+</tr>
+</table>
 
 ---
 
-## Hallazgos clave
+## 🖼️ Cómo se ve
 
-1. **ResNet-18 tiene el mejor AUC (0.976)** — es decir, el mejor *ranking* de pacientes —,
-   **pero no es significativamente mejor** que AutoML en exactitud balanceada
-   (0.869 vs 0.892; IC 95 % solapados; McNemar p = 0.2430). Con este tamaño de muestra no
-   se puede declarar un ganador.
-2. **AutoML supera a la CNN simple en este split** (0.892 vs 0.781; McNemar p = 0.0014,
-   significativo incluso tras Bonferroni), **pero con n = 624 la potencia estadística es
-   limitada** y ± 0.02 entre semillas. El resultado es sugestivo, no concluyente.
+<div align="center">
+
+**Las imágenes con las que trabaja el modelo** — radiografías reales a 28 × 28 píxeles:
+
+<img src="docs/fig_muestras.png" alt="Diez radiografías de 28x28 píxeles etiquetadas como normal o neumonía" width="850">
+
+</div>
+
+> A esta resolución se distingue poco más que la silueta del tórax. Es la primera limitación
+> del proyecto y conviene tenerla presente antes de mirar las métricas.
+
+---
+
+## 📊 Resultados
+
+Conjunto de **prueba** (n = 624), umbral fijo **u = 0.50**, IC 95 % por bootstrap
+(2 000 remuestras). Todos los valores están copiados de las salidas reales del cuaderno.
+
+| Modelo | AUC | Exact. bal. (u = 0.50) | IC 95 % bootstrap | |
+|---|---:|---:|---|:--:|
+| CNN base | 0.959 | 0.781 | [0.750 – 0.813] | |
+| CNN + pesos | 0.968 | 0.848 | [0.818 – 0.878] | |
+| AutoML (Optuna) | 0.969 | **0.892** | [0.866 – 0.918] | 🥇 mejor exact. bal. |
+| ResNet-18 | **0.976** | 0.869 | [0.841 – 0.897] | 🥇 mejor AUC |
+
+> Reconocimiento de honestidad: el cuaderno imprime **0.868** para ResNet-18 en su celda
+> propia (35) y **0.869** en la comparativa final (37). Esta tabla usa la de la comparativa,
+> que es la que alimenta el bootstrap y McNemar. No se ha retocado ninguna cifra.
+
+### Curvas ROC comparativas
+
+<div align="center">
+<img src="docs/fig_roc_comparativa.png" alt="Curvas ROC de los cuatro modelos; las cuatro se solapan en la esquina superior izquierda" width="520">
+</div>
+
+Las cuatro curvas son **casi indistinguibles**. Eso no es un fallo del gráfico: es el resultado.
+AUC 0.959–0.976 con n = 624 e intervalos que se solapan significa que **no se puede declarar
+un ganador**.
+
+### ¿La diferencia es real? Test de McNemar
+
+| Comparación | Acierta solo A | Acierta solo B | p-valor | Veredicto |
+|---|---:|---:|---:|:--|
+| AutoML vs ResNet-18 | 22 | 14 | **0.2430** | ❌ no significativo |
+| CNN + pesos vs ResNet-18 | 13 | 23 | **0.1325** | ❌ no significativo |
+| AutoML vs CNN + pesos | 24 | 6 | **0.0014** | ✅ significativo (también con Bonferroni α = 0.0167) |
+
+### Matriz de confusión de la CNN base
+
+<div align="center">
+<img src="docs/fig_matriz_confusion.png" alt="Matriz de confusión: 132 verdaderos negativos, 102 falsos positivos, 1 falso negativo, 389 verdaderos positivos" width="480">
+</div>
+
+Los **102 falsos positivos frente a 1 solo falso negativo** explican una sensibilidad del
+0.997 con especificidad del 0.564. La CNN no "detecta neumonía": tiende a decir que sí a casi
+todo. La exactitud de 0.835 es solo 21 puntos mejor que la del clasificador trivial (0.625).
+
+<table>
+<tr><td width="50%">
+
+| Métrica | CNN base | CNN + pesos |
+|---|---:|---:|
+| Exactitud | 0.835 | 0.883 |
+| Sensibilidad | 0.997 | 0.987 |
+| Especificidad | 0.564 | 0.709 |
+| F1 | 0.883 | — |
+| Brier (↓ mejor) | 0.1326 | **0.0964** |
+
+</td><td width="50%">
+
+**Calibración** (¿las probabilidades significan algo?)
+
+La curva está lejos de la diagonal perfecta: el modelo **infravalora** las probabilidades
+bajas. Mejora al añadir pesos de clase (Brier 0.1326 → 0.0964), pero sigue sin estar
+calibrado. Una probabilidad de 0.38 corresponde a un 4 % real.
+
+</td></tr>
+</table>
+
+<div align="center">
+<img src="docs/fig_calibracion.png" alt="Curva de calibración: las predicciones infravaloran la probabilidad real" width="440">
+</div>
+
+### Entrenamiento y sobreajuste
+
+<div align="center">
+<img src="docs/fig_curvas_entrenamiento.png" alt="Curvas de pérdida y exactitud por época, con la mejor época marcada en 8" width="850">
+</div>
+
+La pérdida de validación **oscila** mientras la de entrenamiento baja de forma monótona: la
+brecha crece tras la época 8. Es la señal temprana de que el modelo empieza a memorizar, y la
+razón de guardar el checkpoint por pérdida de validación y no por época final.
+
+### Variabilidad entre semillas (lo que casi nadie reporta)
+
+| CNN, 3 semillas (42, 7, 123) | AUC | Exact. bal. (u = 0.50) |
+|---|---:|---:|
+| Sin pesos | 0.966 ± 0.005 | 0.781 ± 0.016 |
+| Con pesos | 0.967 ± 0.005 | 0.829 ± 0.018 |
+
+**± 0.02 entre semillas** es del mismo orden que las diferencias que se interpretan entre
+modelos. Cualquier conclusión más fina que eso no es defendible con estos datos.
+
+---
+
+## 🔍 Hallazgos clave
+
+1. **ResNet-18 tiene el mejor AUC (0.976)** — mejor *ranking* de pacientes —, **pero no es
+   significativamente mejor** que AutoML en exactitud balanceada (0.869 vs 0.892; IC 95 %
+   solapados; McNemar p = 0.2430).
+2. **AutoML supera a la CNN simple en este split** (0.892 vs 0.781; p = 0.0014, significativo
+   incluso tras Bonferroni), **pero con n = 624 la potencia es limitada** y ± 0.02 entre semillas.
 3. **Los umbrales elegidos en validación empeoraron en prueba**: AutoML con u = 0.12 cae de
-   0.892 a **0.852**; ResNet-18 con u = 0.33 cae de 0.869 a **0.848** (la CNN con pesos y
-   u = 0.74, en cambio, *mejoró* de 0.848 a 0.876). Hay **evidencia de *distribution shift***
-   entre los splits de validación y prueba: un umbral no es una propiedad del modelo, sino
-   del reparto de datos.
-4. **Las 25 pruebas de Optuna pueden haber sobreajustado la validación** (0.978 en
-   validación frente a 0.852 en prueba con el mismo umbral). El valor de validación es
-   optimista por construcción: se eligió el máximo de 25 intentos sobre ese mismo conjunto.
-5. **No hay validez clínica.** Ejercicio retrospectivo, imágenes de 28 × 28, un único
-   conjunto de datos y ningún centro externo. Nada de lo aquí presentado es apto para uso
-   asistencial.
+   0.892 a **0.852**; ResNet-18 con u = 0.33 cae de 0.869 a **0.848** (la CNN con pesos, en
+   cambio, *mejora* de 0.848 a 0.876). Evidencia de ***distribution shift*** entre splits:
+   un umbral no es una propiedad del modelo, sino del reparto de datos.
+4. **Las 25 pruebas de Optuna pueden haber sobreajustado la validación**: 0.978 en validación
+   frente a **0.852** en prueba con el mismo umbral, porque el valor de validación es el
+   máximo de 25 intentos sobre 524 imágenes.
+5. **No hay validez clínica.** Retrospectivo, 28 × 28, un solo conjunto de datos, ningún
+   centro externo.
 
-> Matiz que conviene leer junto al punto 3: la dirección del efecto **no es unánime**
-> (AutoML y ResNet empeoran al transferir el umbral; la CNN con pesos mejora). Por eso el
-> cuaderno lo describe como señal de inestabilidad de umbrales, no como una ley general.
-> El AUC no depende de umbral y se mantiene ≈ 0.97 en los cuatro modelos.
+> **El hallazgo 3 no es unánime, y eso es parte del resultado.** AutoML y ResNet empeoran al
+> transferir el umbral; la CNN con pesos mejora. Por eso se describe como *inestabilidad de
+> umbrales* y no como una ley general. El AUC, que no depende de umbrales, se mantiene ≈ 0.97.
 
 ---
 
-## Cómo ejecutar en Colab
+## 🚀 Cómo se ejecuta
 
-**Opción A — botón de Colab (recomendada):** pulsa el badge del inicio y ejecuta
-*Entorno de ejecución → Ejecutar todas*. El cuaderno instala lo que necesita y descarga los
-datos solo. Una GPU T4 gratuita basta; el cuaderno completo tarda aproximadamente 15–25 min.
+### Opción A — Google Colab (recomendada, 1 clic)
 
-**Opción B — local:**
+<div align="center">
+
+[![Abrir en Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/abdiellzz/IAMED/blob/main/IAdoc.ipynb)
+
+</div>
+
+1. Pulsa el badge.
+2. Menú **Entorno de ejecución → Ejecutar todas**.
+3. Acepta el aviso de que el cuaderno no es de Google.
+4. Espera. Con GPU T4: **20–40 min**. En CPU funciona igual, bastante más lento.
+
+El cuaderno instala lo que necesita (`!pip install medmnist`, `optuna`) y descarga los datos
+solo. No hay que preparar nada.
+
+> [!TIP]
+> Si Colab te avisa de que se ha agotado la GPU, ve a *Entorno de ejecución → Cambiar tipo de
+> entorno* y selecciona **T4 GPU**. El código detecta CPU/GPU automáticamente y no hay que
+> tocar ninguna línea.
+
+### Opción B — Local
 
 ```bash
+git clone https://github.com/abdiellzz/IAMED.git
+cd IAMED
 pip install -r requirements.txt
 jupyter notebook IAdoc.ipynb
 ```
 
-El cuaderno usa `torch.device("cuda" if torch.cuda.is_available() else "cpu")`, así que
-funciona en CPU (más lento) sin tocar código. Los pesos preentrenados de ResNet-18 se
-descargan de `download.pytorch.org` la primera vez. En una T4, el cuaderno completo suele
-tardar entre 20 y 40 minutos; la búsqueda de Optuna (25 pruebas × 8 épocas) es la parte
-más lenta.
+Requiere Python 3.9+. Los pesos de ResNet-18 (~45 MB) se descargan de `download.pytorch.org`
+la primera vez.
 
-**Dónde se guardan los artefactos:** el cuaderno escribe `modelo_cnn_pneumoniamnist.pt` y
-`modelo_automl.pt` en el directorio de trabajo (en Colab, `/content/`). No están versionados
-en el repositorio; se regeneran al ejecutar. Los `.npz` de MedMNIST se descargan en
-`./datos_medmnist/` (también ignorado por Git).
+### Verificar las cifras **sin** reentrenar
 
----
+Todas las métricas están en [`results/metrics.json`](results/metrics.json):
 
-## Limitaciones
+```bash
+python -c "import json; m=json.load(open('results/metrics.json')); \
+print(m['comparativa_test']['modelos']['resnet18'])"
+```
 
-- **Split retrospectivo y único.** Una sola partición oficial de un solo dataset, con
-  imágenes de origen pediátrico. No hay validación externa, temporal ni prospectiva.
-- **Cambio de distribución validación → prueba.** Los umbrales óptimos de validación no se
-  transfieren al conjunto de prueba (ver hallazgo 3). Parte de la brecha puede deberse a
-  que validación y prueba no son intercambiables.
-- **Resolución 28 × 28 píxeles en escala de grises.** Se pierde prácticamente toda la
-  información radiológica fina: un diagnóstico real requiere mucha más resolución y, sobre
-  todo, contexto clínico.
-- **Una sola fuente de datos**, con etiquetas heredadas de un único estudio previo.
-  No se evalúa sesgo por sexo, edad, equipo de rayos o centro.
-- **Potencia estadística limitada** (n = 624 en prueba) y desbalance 234/390. Los intervalos
-  de confianza bootstrap no corrigen el sesgo del split, solo su variabilidad.
-- **Selección optimista en validación.** 25 intentos de Optuna sobre 524 imágenes de
-  validación: la métrica de validación (0.978) es un máximo sobre muestras pequeñas.
-- **Sin calibración clínica ni análisis de subgrupos.** El Brier score se reporta como
-  diagnóstico de calibración, pero no se aplica recalibración.
+Las figuras de `docs/` salen **extraídas de las salidas guardadas** en `IAdoc.ipynb`: son las
+de la ejecución original, no recreaciones.
 
 ---
 
-## Cómo lo desplegaría en AWS
+## 🎯 Cómo se usa el modelo
 
-Esta sección es **de diseño**: no hay nada desplegado ni facturado. El objetivo es mostrar
-cómo el cuaderno se traduciría a un flujo gestionado de MLOps en AWS, manteniendo las
-mismas garantías metodológicas (nada de elegir umbrales con el conjunto de prueba).
+El cuaderno guarda el modelo y demuestra cómo recargarlo e inferir sobre una imagen. Este es
+el patrón real (celda 24 del cuaderno):
+
+```python
+import torch
+from torchvision import transforms
+from medmnist import PneumoniaMNIST
+
+# 1. Reconstruir la arquitectura y cargar los pesos
+modelo = CNNSencilla(num_clases=2, num_canales=1)
+checkpoint = torch.load("modelo_cnn_pneumoniamnist.pt",
+                         map_location="cpu", weights_only=True)
+modelo.load_state_dict(checkpoint["estado_modelo"])
+modelo.eval()
+
+# 2. Preparar UNA imagen con las MISMAS transformaciones del entrenamiento
+transform = transforms.Compose([
+    transforms.ToTensor(),
+    transforms.Normalize(mean=[0.5], std=[0.5]),
+])
+
+ds_test = PneumoniaMNIST(split="test", download=True, transform=transform)
+imagen, etiqueta_real = ds_test[0]
+
+# 3. Inferencia
+NOMBRES_CLASES = ["normal", "pneumonia"]   # probs[1] = probabilidad de neumonía
+
+with torch.no_grad():
+    probs = torch.softmax(modelo(imagen.unsqueeze(0)), dim=1)[0]
+
+clase = int(probs.argmax())
+print(f"Imagen 0 -> Real: {NOMBRES_CLASES[int(etiqueta_real[0])]} | "
+      f"Predicho: {NOMBRES_CLASES[clase]} ({probs[clase]*100:.1f}%)")
+```
+
+**Qué devuelve el cuaderno al ejecutar esa celda** (salida real):
+
+```text
+Modelo guardado en: /content/modelo_cnn_pneumoniamnist.pt
+Exactitud del modelo recargado en prueba: 0.835
+
+Imagen 0 -> real: pneumonia | predicho: pneumonia (100.0%)
+```
+
+> [!IMPORTANT]
+> Para clasificar en binario hay que convertir la probabilidad en decisión:
+> `prediccion = 1 if probs[1] >= umbral else 0`. Con `umbral = 0.50` la CNN base da
+> exactitud balanceada 0.781. Con el umbral elegido en validación (0.89 en su momento) sube a
+> 0.869 en prueba — pero **eso no se generaliza**, como muestra el hallazgo 3. Este repositorio
+> no ofrece un umbral "recomendado" porque no existe uno válido fuera de su split.
+
+**Dónde se guardan los artefactos:** `modelo_cnn_pneumoniamnist.pt` y `modelo_automl.pt` en el
+directorio de trabajo (en Colab, `/content/`). No están versionados: se regeneran al ejecutar.
+
+---
+
+## 🧭 Qué hay dentro del cuaderno
+
+| Bloque | Celdas | Contenido |
+|---|---|---|
+| 1 | 1–7 | Instalación, semillas, GPU/CPU, descarga de los 3 splits |
+| 2 | 8–12 | Visualización de ejemplos y `DataLoader` sin fugas de datos |
+| 3 | 13–18 | CNN desde cero + entrenamiento + curvas de pérdida |
+| 4 | 19–24 | Evaluación en prueba, matriz de confusión, guardado y recarga |
+| 5 | 25–28 | Pérdida ponderada, ROC, calibración, 3 semillas |
+| 6 | 29–31 | AutoML con Optuna: 25 pruebas y modelo campeón |
+| 7 | 32–35 | ResNet-18: adaptación 1 canal, ajuste fino |
+| 8 | 36–39 | Comparativa, bootstrap, McNemar, discusión |
+| 9 | 40–41 | Conclusiones y resumen de hallazgos |
+
+---
+
+## ☁️ Cómo lo desplegaría en AWS
+
+Esta sección es **de diseño**: no hay nada desplegado ni facturado. Muestra cómo se traduciría
+el cuaderno a un flujo gestionado de MLOps, manteniendo las garantías metodológicas.
 
 | Pieza del cuaderno | Servicio AWS | Para qué |
 |---|---|---|
-| Datos `.npz` (MedMNIST) | **Amazon S3** con *versioning* | Almacén único de datos; el versionado permite reproducir cualquier corrida y auditar de dónde salió cada split. |
-| Cuaderno / exploración | **Amazon SageMaker Studio** | Entorno gestionado con GPU para el desarrollo interactivo del `.ipynb`. |
-| `pipeline_completo()` | **SageMaker Pipelines** | Encadenar de forma reproducible: preparación → entrenamiento → evaluación → registro (con linaje entre pasos). |
-| Optuna (`estudio.optimize`) | **SageMaker Automatic Model Tuning** | Búsqueda de hiperparámetros gestionada, con *early stopping* equivalente al *pruning* de Optuna. |
-| `torch.save(...)` → `.pt` | **SageMaker Model Registry** | Versionar el artefacto junto a sus métricas y *approval status*; nada pasa a producción sin aprobación. |
-| `predecir()` | **SageMaker Endpoint** en tiempo real | Inferencia con un contenedor de PyTorch sobre las mismas transformaciones. Para uso educativo, un endpoint *serverless* o *Batch Transform* es más barato. |
-| *Distribution shift* val → test | **SageMaker Model Monitor** | Comparar la distribución de entrada y de predicciones entre el baseline y el tráfico real, y alertar de la deriva (justo el efecto del hallazgo 3). |
-| Desbalance de clases | **SageMaker Clarify** | Medir sesgo (*class imbalance*, impacto dispar entre clases) y explicar predicciones con SHAP. El remuestreo y los pesos de clase siguen siendo decisiones del pipeline, no de Clarify. |
+| Datos `.npz` (MedMNIST) | **Amazon S3** con *versioning* | Almacén único; el versionado permite reproducir cualquier corrida y auditar cada split. |
+| Cuaderno / exploración | **Amazon SageMaker Studio** | Entorno gestionado con GPU para el desarrollo interactivo. |
+| `pipeline_completo()` | **SageMaker Pipelines** | Cadena reproducible: preparación → entrenamiento → evaluación → registro, con linaje. |
+| Optuna (`estudio.optimize`) | **SageMaker Automatic Model Tuning** | Búsqueda gestionada, con *early stopping* equivalente al *pruning* de Optuna. |
+| `torch.save(...)` → `.pt` | **SageMaker Model Registry** | Versionar artefacto + métricas + *approval status*; nada pasa a producción sin aprobación. |
+| `predecir()` | **SageMaker Endpoint** en tiempo real | Inferencia con contenedor de PyTorch y las mismas transformaciones. Para una demo, *serverless* o *Batch Transform* es más barato. |
+| *Distribution shift* val → test | **SageMaker Model Monitor** | Comparar distribución de entrada y predicciones contra el baseline y alertar de la deriva (justo el hallazgo 3). |
+| Desbalance de clases | **SageMaker Clarify** | Medir sesgo (*class imbalance*, impacto dispar) y explicar con SHAP. Los pesos de clase siguen siendo decisión del pipeline, no de Clarify. |
 
-```
+```text
    S3 (versioned: .npz, .pt, métricas)
         │
         ▼
    SageMaker Studio  ──►  SageMaker Pipelines
         │                       │
-        │                       ├─► Training (CNN / ResNet-18)  ──► ECR (imagen)
+        │                       ├─► Training (CNN / ResNet-18) ──► ECR (imagen)
         │                       ├─► Automatic Model Tuning (Optuna)
         │                       ├─► Evaluation + Clarify (sesgo, SHAP)
         │                       └─► Model Registry (candidato aprobado)
@@ -239,74 +356,67 @@ mismas garantías metodológicas (nada de elegir umbrales con el conjunto de pru
                     (drift + métricas → CloudWatch)
 ```
 
-Notas de criterio:
+Criterios que mantendría en cualquier despliegue:
 
-- **El umbral se elige en validación y se congela**, se despliegue donde se despliegue: el
-  conjunto de prueba nunca participa en la selección del punto de corte.
-- Un endpoint permanente cuesta dinero sin aportar nada a un proyecto educativo. Para una
-  demo pública, *Batch Transform* o inferencia *serverless* son las opciones sensatas.
-- Lo que **no** resolvería AWS: la falta de validez externa, la resolución 28 × 28 o la
-  ausencia de revisión clínica. La infraestructura gestiona el flujo, no la evidencia.
+- **El umbral se elige en validación y se congela.** El conjunto de prueba nunca participa en
+  la selección del punto de corte.
+- Un endpoint permanente cuesta dinero sin aportar nada a un proyecto educativo.
+- Lo que **no** resuelve AWS: la falta de validez externa, la resolución 28 × 28 o la ausencia
+  de revisión clínica. La infraestructura gestiona el flujo, no la evidencia.
 
 ---
 
-## Estructura del repositorio
+## ⚠️ Limitaciones
 
-```
+| Limitación | Impacto |
+|---|---|
+| **Split retrospectivo y único** | Sin validación externa, temporal ni prospectiva: no se sabe cómo se comporta fuera de este conjunto. |
+| **Cambio de distribución val → test** | Los umbrales óptimos de validación no se transfieren (hallazgo 3). |
+| **Resolución 28 × 28** | Se pierde la información radiológica fina; un diagnóstico real exige mucha más resolución y contexto clínico. |
+| **Una sola fuente, etiquetas heredadas** | No se evalúa sesgo por sexo, edad, equipo de rayos ni centro. |
+| **Potencia estadística limitada** | n = 624 y desbalance 234/390; el bootstrap mide variabilidad, no corrige el sesgo del split. |
+| **Selección optimista en validación** | 25 intentos de Optuna sobre 524 imágenes: el 0.978 de validación es un máximo, no una estimación insesgada. |
+| **Sin recalibración** | El Brier score diagnostica, pero no se corrige la calibración (ver curva). |
+| **Sin análisis de subgrupos** | No hay métricas por edad, sexo o gravedad; ni siquiera están disponibles en los datos. |
+
+---
+
+## 📁 Estructura del repositorio
+
+```text
 IAMED/
 ├── IAdoc.ipynb          # Cuaderno principal (ejecutado en Colab, salidas incluidas)
 ├── README.md            # Este documento
+├── MODEL_CARD.md        # Ficha del modelo: uso previsto, sesgos, limitaciones
 ├── requirements.txt     # Dependencias mínimas reproducibles
-├── MODEL_CARD.md        # Ficha del modelo (uso previsto, sesgos, limitaciones)
 ├── LICENSE              # MIT para el código (los datos tienen su propia licencia)
 ├── .gitignore           # Artefactos, checkpoints y datos descargados
 ├── results/
-│   └── metrics.json     # Todas las métricas del cuaderno, en formato legible por máquina
+│   └── metrics.json     # Todas las métricas del cuaderno, legibles por máquina
 └── docs/                # Figuras extraídas de las salidas del cuaderno
 ```
 
-**Contenido del cuaderno:** exploración de datos y visualización → *baseline* CNN →
-métricas y matriz de confusión → guardado/carga del modelo → pérdida ponderada por clase →
-curvas ROC y calibración → variabilidad entre semillas → AutoML con Optuna → ResNet-18 con
-ajuste fino → comparativa con bootstrap y McNemar → discusión y conclusiones.
-
 ---
 
-## Verificar las cifras sin reentrenar
-
-Todas las métricas de este README están volcadas en [`results/metrics.json`](results/metrics.json),
-copiadas literalmente de las salidas del cuaderno. Puedes comprobarlas sin GPU ni
-entrenamiento:
-
-```bash
-python -c "import json; m=json.load(open('results/metrics.json')); \
-print(m['comparativa_test']['modelos']['resnet18'])"
-```
-
-Las figuras de `docs/` están extraídas directamente de las salidas guardadas en
-`IAdoc.ipynb`: son las que produjo la ejecución original, no recreaciones.
-
----
-
-## Créditos y cita
+## 📚 Créditos y cita
 
 Datos creados y mantenidos por terceros. Si reutilizas este trabajo, cita las fuentes
 originales del conjunto de datos:
 
 - **Yang, J., Shi, R., Wei, D., Liu, Z., Zhao, L., Ke, B., Pfister, H., & Ni, B. (2023).**
   *MedMNIST v2: A large-scale lightweight benchmark for 2D and 3D biomedical image
-  classification.* Scientific Data, 10(1), 41.
-  <https://doi.org/10.1038/s41597-022-01721-8>
-- **Kermany, D. S., Goldbaum, M., Cai, W., et al. (2018).** *Identifying medical diagnoses
-  and treatable diseases by image-based deep learning.* Cell, 172(5), 1122–1131.e9.
+  classification.* Scientific Data, 10(1), 41. <https://doi.org/10.1038/s41597-022-01721-8>
+- **Kermany, D. S., Goldbaum, M., Cai, W., et al. (2018).** *Identifying medical diagnoses and
+  treatable diseases by image-based deep learning.* Cell, 172(5), 1122–1131.e9.
   <https://doi.org/10.1016/j.cell.2018.02.010>
-  Conjunto de imágenes: Mendeley Data, <https://doi.org/10.17632/rscbjbr9sj.2>
-
-Agradecimiento al equipo de MedMNIST por empaquetar y mantener estos datos en un formato
-utilizable con fines docentes.
 
 - **Autor del cuaderno:** Abdieel Camargo ([@abdiellzz](https://github.com/abdiellzz)).
-- **Código de este repositorio:** licencia MIT (ver [`LICENSE`](LICENSE)).
-- **Datos:** licencia propia de MedMNIST (CC BY 4.0 para el conjunto agregado; cada
-  subconjunto conserva la licencia de su publicación original). **No** están cubiertos por
-  la MIT de este repositorio.
+- **Código:** licencia MIT ([`LICENSE`](LICENSE)).
+- **Datos:** licencia propia de MedMNIST (CC BY 4.0 para el conjunto agregado; cada subconjunto
+  conserva la licencia de su publicación original). **No** cubiertos por la MIT del repositorio.
+
+<div align="center">
+
+### Si este repositorio te resulta útil, una ⭐ ayuda a que otros lo encuentren
+
+</div>
