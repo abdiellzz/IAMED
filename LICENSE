@@ -1,0 +1,57 @@
+MIT License
+
+Copyright (c) 2026 Abdieel Camargo
+
+-------------------------------------------------------------------------------
+NOTA SOBRE LOS DATOS (no cubiertos por esta licencia)
+-------------------------------------------------------------------------------
+
+Esta licencia MIT se aplica UNICAMENTE al codigo de este repositorio
+(por ejemplo, el codigo de IAdoc.ipynb y los archivos de configuracion).
+
+Los DATOS no forman parte de este repositorio ni estan cubiertos por la MIT:
+el cuaderno descarga el conjunto PneumoniaMNIST de MedMNIST v2 en tiempo de
+ejecucion. MedMNIST se distribuye bajo licencia Creative Commons Attribution
+4.0 International (CC BY 4.0), salvo DermaMNIST (CC BY-NC 4.0), y cada
+subconjunto conserva ademas la licencia y las condiciones de la publicacion de
+la que procede. En el caso de PneumoniaMNIST, las imagenes provienen del
+conjunto de radiografias pediatricas de Kermany et al. (2018).
+
+Por tanto, quien reutilice los datos debe respetar las licencias de MedMNIST y
+de la fuente original, y citar:
+
+  - Yang, J., Shi, R., Wei, D., Liu, Z., Zhao, L., Ke, B., Pfister, H., & Ni, B.
+    (2023). MedMNIST v2: A large-scale lightweight benchmark for 2D and 3D
+    biomedical image classification. Scientific Data, 10(1), 41.
+    https://doi.org/10.1038/s41597-022-01721-8
+
+  - Kermany, D. S., Goldbaum, M., Cai, W., et al. (2018). Identifying medical
+    diagnoses and treatable diseases by image-based deep learning. Cell,
+    172(5), 1122-1131.e9.
+    https://doi.org/10.1016/j.cell.2018.02.010
+
+Los pesos de ResNet-18 preentrenados se descargan de download.pytorch.org y se
+rigen por la licencia de torchvision/PyTorch (BSD-3-Clause).
+
+AVISO: este repositorio es un ejercicio educativo retrospectivo. No es un
+dispositivo medico y no tiene validez clinica.
+
+-------------------------------------------------------------------------------
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
