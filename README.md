@@ -15,7 +15,7 @@
 </div>
 
 > [!CAUTION]
-> ### ⚠️ No tiene validez clínica
+> ### No tiene validez clínica
 > Este repositorio es un **ejercicio educativo y retrospectivo**. Los modelos **no son
 > dispositivos médicos**, no están validados, y **no deben usarse para diagnosticar,
 > descartar ni priorizar** a ningún paciente. Las imágenes se reducen a **28 × 28 píxeles**
@@ -24,7 +24,7 @@
 
 ---
 
-## 📋 Qué es esto, en 60 segundos
+## Qué es esto, en 60 segundos
 
 <table>
 <tr>
@@ -70,7 +70,7 @@ explícita de **cuándo el modelo falla y por qué**.
 
 ---
 
-## 🖼️ Cómo se ve
+## Cómo se ve
 
 <div align="center">
 
@@ -85,7 +85,7 @@ explícita de **cuándo el modelo falla y por qué**.
 
 ---
 
-## 📸 Capturas reales
+## Capturas reales
 
 Salidas **reales** del código de este repositorio. Nada de mockups.
 
@@ -109,27 +109,27 @@ Salidas **reales** del código de este repositorio. Nada de mockups.
 
 ---
 
-## 🧱 Código reutilizable (`src/`)
+## Código reutilizable (`src/`)
 
 El cuaderno es la narrativa; `src/` es la versión que puedes importar y ejecutar.
 
 ```text
 src/
-├── data.py       # loaders con las transformaciones exactas del cuaderno
-├── model.py      # CNNSencilla + ResNet-18 adaptada + pesos por clase
-├── engine.py     # entrenamiento, predicción, umbral, métricas
-├── train.py      # CLI de entrenamiento
-└── evaluate.py   # CLI de evaluación e inferencia de una imagen
-tests/            # 17 tests (formas, parámetros, métricas, umbral)
+├── data.py # loaders con las transformaciones exactas del cuaderno
+├── model.py # CNNSencilla + ResNet-18 adaptada + pesos por clase
+├── engine.py # entrenamiento, predicción, umbral, métricas
+├── train.py # CLI de entrenamiento
+└── evaluate.py # CLI de evaluación e inferencia de una imagen
+tests/ # 17 tests (formas, parámetros, métricas, umbral)
 ```
 
 ```bash
-make test                                    # 17 tests en ~3 s
-make train MODEL=cnn EPOCHS=15               # entrena y guarda el checkpoint
-make evaluate                                # métricas en el split de prueba
+make test # 17 tests en ~3 s
+make train MODEL=cnn EPOCHS=15 # entrena y guarda el checkpoint
+make evaluate # métricas en el split de prueba
 
 # o sin make:
-python -m src.train --model cnn --epochs 1   # smoke test rápido
+python -m src.train --model cnn --epochs 1 # smoke test rápido
 python -m src.evaluate --checkpoint artifacts/modelo_cnn.pt --imagen rx.png
 ```
 
@@ -153,7 +153,7 @@ Imagen: rx.png
 
 ---
 
-## 📊 Resultados
+## Resultados
 
 Conjunto de **prueba** (n = 624), umbral fijo **u = 0.50**, IC 95 % por bootstrap
 (2 000 remuestras). Todos los valores están copiados de las salidas reales del cuaderno.
@@ -162,8 +162,8 @@ Conjunto de **prueba** (n = 624), umbral fijo **u = 0.50**, IC 95 % por bootstra
 |---|---:|---:|---|:--:|
 | CNN base | 0.959 | 0.781 | [0.750 – 0.813] | |
 | CNN + pesos | 0.968 | 0.848 | [0.818 – 0.878] | |
-| AutoML (Optuna) | 0.969 | **0.892** | [0.866 – 0.918] | 🥇 mejor exact. bal. |
-| ResNet-18 | **0.976** | 0.869 | [0.841 – 0.897] | 🥇 mejor AUC |
+| AutoML (Optuna) | 0.969 | **0.892** | [0.866 – 0.918] | mejor exact. bal. |
+| ResNet-18 | **0.976** | 0.869 | [0.841 – 0.897] | mejor AUC |
 
 > Reconocimiento de honestidad: el cuaderno imprime **0.868** para ResNet-18 en su celda
 > propia (35) y **0.869** en la comparativa final (37). Esta tabla usa la de la comparativa,
@@ -183,9 +183,9 @@ un ganador**.
 
 | Comparación | Acierta solo A | Acierta solo B | p-valor | Veredicto |
 |---|---:|---:|---:|:--|
-| AutoML vs ResNet-18 | 22 | 14 | **0.2430** | ❌ no significativo |
-| CNN + pesos vs ResNet-18 | 13 | 23 | **0.1325** | ❌ no significativo |
-| AutoML vs CNN + pesos | 24 | 6 | **0.0014** | ✅ significativo (también con Bonferroni α = 0.0167) |
+| AutoML vs ResNet-18 | 22 | 14 | **0.2430** | no significativo |
+| CNN + pesos vs ResNet-18 | 13 | 23 | **0.1325** | no significativo |
+| AutoML vs CNN + pesos | 24 | 6 | **0.0014** | significativo (también con Bonferroni α = 0.0167) |
 
 ### Matriz de confusión de la CNN base
 
@@ -245,7 +245,7 @@ modelos. Cualquier conclusión más fina que eso no es defendible con estos dato
 
 ---
 
-## 🔍 Hallazgos clave
+## Hallazgos clave
 
 1. **ResNet-18 tiene el mejor AUC (0.976)** — mejor *ranking* de pacientes —, **pero no es
    significativamente mejor** que AutoML en exactitud balanceada (0.869 vs 0.892; IC 95 %
@@ -268,7 +268,7 @@ modelos. Cualquier conclusión más fina que eso no es defendible con estos dato
 
 ---
 
-## 🚀 Cómo se ejecuta
+## Cómo se ejecuta
 
 ### Opción A — Google Colab (recomendada, 1 clic)
 
@@ -317,7 +317,7 @@ de la ejecución original, no recreaciones.
 
 ---
 
-## 🎯 Cómo se usa el modelo
+## Cómo se usa el modelo
 
 El cuaderno guarda el modelo y demuestra cómo recargarlo e inferir sobre una imagen. Este es
 el patrón real (celda 24 del cuaderno):
@@ -344,7 +344,7 @@ ds_test = PneumoniaMNIST(split="test", download=True, transform=transform)
 imagen, etiqueta_real = ds_test[0]
 
 # 3. Inferencia
-NOMBRES_CLASES = ["normal", "pneumonia"]   # probs[1] = probabilidad de neumonía
+NOMBRES_CLASES = ["normal", "pneumonia"] # probs[1] = probabilidad de neumonía
 
 with torch.no_grad():
     probs = torch.softmax(modelo(imagen.unsqueeze(0)), dim=1)[0]
@@ -375,7 +375,7 @@ directorio de trabajo (en Colab, `/content/`). No están versionados: se regener
 
 ---
 
-## 🧭 Qué hay dentro del cuaderno
+## Qué hay dentro del cuaderno
 
 | Bloque | Celdas | Contenido |
 |---|---|---|
@@ -391,7 +391,7 @@ directorio de trabajo (en Colab, `/content/`). No están versionados: se regener
 
 ---
 
-## ☁️ Cómo lo desplegaría en AWS
+## Cómo lo desplegaría en AWS
 
 Esta sección es **de diseño**: no hay nada desplegado ni facturado. Muestra cómo se traduciría
 el cuaderno a un flujo gestionado de MLOps, manteniendo las garantías metodológicas.
@@ -411,16 +411,16 @@ el cuaderno a un flujo gestionado de MLOps, manteniendo las garantías metodoló
    S3 (versioned: .npz, .pt, métricas)
         │
         ▼
-   SageMaker Studio  ──►  SageMaker Pipelines
-        │                       │
-        │                       ├─► Training (CNN / ResNet-18) ──► ECR (imagen)
-        │                       ├─► Automatic Model Tuning (Optuna)
-        │                       ├─► Evaluation + Clarify (sesgo, SHAP)
-        │                       └─► Model Registry (candidato aprobado)
-        │                                     │
-        │                                     ▼
-        │                            Endpoint (real-time) ◄── predecir()
-        │                                     │
+   SageMaker Studio ──► SageMaker Pipelines
+        │ │
+        │ ├─► Training (CNN / ResNet-18) ──► ECR (imagen)
+        │ ├─► Automatic Model Tuning (Optuna)
+        │ ├─► Evaluation + Clarify (sesgo, SHAP)
+        │ └─► Model Registry (candidato aprobado)
+        │ │
+        │ ▼
+        │ Endpoint (real-time) ◄── predecir()
+        │ │
         └──────────────► Model Monitor ◄──────┘
                     (drift + métricas → CloudWatch)
 ```
@@ -435,7 +435,7 @@ Criterios que mantendría en cualquier despliegue:
 
 ---
 
-## ⚠️ Limitaciones
+## Limitaciones
 
 | Limitación | Impacto |
 |---|---|
@@ -450,32 +450,32 @@ Criterios que mantendría en cualquier despliegue:
 
 ---
 
-## 📁 Estructura del repositorio
+## Estructura del repositorio
 
 ```text
 IAMED/
-├── IAdoc.ipynb          # Cuaderno principal (ejecutado en Colab, salidas incluidas)
-├── README.md            # Este documento
-├── MODEL_CARD.md        # Ficha del modelo: uso previsto, sesgos, limitaciones
-├── CITATION.cff         # Metadatos de citación (botón "Cite this repository")
-├── Makefile             # make test / train / evaluate
-├── pyproject.toml       # Configuración de ruff y pytest
-├── requirements.txt     # Dependencias mínimas reproducibles
+├── IAdoc.ipynb # Cuaderno principal (ejecutado en Colab, salidas incluidas)
+├── README.md # Este documento
+├── MODEL_CARD.md # Ficha del modelo: uso previsto, sesgos, limitaciones
+├── CITATION.cff # Metadatos de citación (botón "Cite this repository")
+├── Makefile # make test / train / evaluate
+├── pyproject.toml # Configuración de ruff y pytest
+├── requirements.txt # Dependencias mínimas reproducibles
 ├── requirements-dev.txt # Dependencias de desarrollo (pytest, ruff)
-├── LICENSE              # MIT para el código
-├── DATA_LICENSE.md      # Licencia de los datos (MedMNIST, CC BY 4.0)
-├── .gitignore           # Artefactos, checkpoints y datos descargados
-├── src/                 # Código reutilizable (data, model, engine, train, evaluate)
-├── tests/               # 17 tests con pytest
-├── .github/workflows/   # CI: lint + tests + integridad del cuaderno
+├── LICENSE # MIT para el código
+├── DATA_LICENSE.md # Licencia de los datos (MedMNIST, CC BY 4.0)
+├── .gitignore # Artefactos, checkpoints y datos descargados
+├── src/ # Código reutilizable (data, model, engine, train, evaluate)
+├── tests/ # 17 tests con pytest
+├── .github/workflows/ # CI: lint + tests + integridad del cuaderno
 ├── results/
-│   └── metrics.json     # Todas las métricas del cuaderno, legibles por máquina
-└── docs/                # Figuras y capturas extraídas de las salidas reales
+│ └── metrics.json # Todas las métricas del cuaderno, legibles por máquina
+└── docs/ # Figuras y capturas extraídas de las salidas reales
 ```
 
 ---
 
-## 📚 Créditos y cita
+## Créditos y cita
 
 Datos creados y mantenidos por terceros. Si reutilizas este trabajo, cita las fuentes
 originales del conjunto de datos:
@@ -495,6 +495,6 @@ originales del conjunto de datos:
 
 <div align="center">
 
-### Si este repositorio te resulta útil, una ⭐ ayuda a que otros lo encuentren
+### Si este repositorio te resulta útil, una estrella ayuda a que otros lo encuentren
 
 </div>
