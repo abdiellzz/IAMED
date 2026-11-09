@@ -1,0 +1,79 @@
+cff-version: 1.2.0
+title: >-
+  Clasificador de radiografías pediátricas con PyTorch (MedMNIST) —
+  proyecto educativo
+message: >-
+  Si usas este código, cita este repositorio. Si usas los datos, cita además
+  MedMNIST v2 (Yang et al., 2023) y Kermany et al. (2018), que aparecen en
+  references. Este trabajo es un ejercicio educativo y NO tiene validez clínica.
+type: software
+authors:
+  - family-names: Camargo
+    given-names: Abdieel
+    alias: abdiellzz
+    website: "https://github.com/abdiellzz"
+repository-code: "https://github.com/abdiellzz/IAMED"
+url: "https://github.com/abdiellzz/IAMED"
+license: MIT
+keywords:
+  - machine-learning
+  - pytorch
+  - medmnist
+  - medical-imaging
+  - education
+  - optuna
+  - transfer-learning
+abstract: >-
+  Comparación educativa de cuatro enfoques (CNN desde cero, CNN con pérdida
+  ponderada, AutoML con Optuna y ResNet-18 con ajuste fino) sobre
+  PneumoniaMNIST, con intervalos de confianza por bootstrap, test exacto de
+  McNemar y análisis del cambio de distribución entre validación y prueba.
+  Ejercicio retrospectivo sin validez clínica.
+version: 1.0.0
+date-released: "2026-11-09"
+references:
+  - type: article
+    title: >-
+      MedMNIST v2: A large-scale lightweight benchmark for 2D and 3D biomedical
+      image classification
+    authors:
+      - family-names: Yang
+        given-names: Jiancheng
+      - family-names: Shi
+        given-names: Rui
+      - family-names: Wei
+        given-names: Donglai
+      - family-names: Liu
+        given-names: Zequan
+      - family-names: Zhao
+        given-names: Lin
+      - family-names: Ke
+        given-names: Bilian
+      - family-names: Pfister
+        given-names: Hanspeter
+      - family-names: Ni
+        given-names: Bingbing
+    journal: Scientific Data
+    volume: 10
+    issue: 1
+    start: 41
+    year: 2023
+    doi: "10.1038/s41597-022-01721-8"
+  - type: article
+    title: >-
+      Identifying medical diagnoses and treatable diseases by image-based deep
+      learning
+    authors:
+      - family-names: Kermany
+        given-names: Daniel S.
+      - family-names: Goldbaum
+        given-names: Michael
+      - family-names: Cai
+        given-names: Wenjia
+    journal: Cell
+    volume: 172
+    issue: 5
+    start: 1122
+    end: 1131
+    year: 2018
+    doi: "10.1016/j.cell.2018.02.010"

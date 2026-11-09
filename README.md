@@ -85,6 +85,74 @@ explícita de **cuándo el modelo falla y por qué**.
 
 ---
 
+## 📸 Capturas reales
+
+Salidas **reales** del código de este repositorio. Nada de mockups.
+
+**Los tests pasan** (17 tests, ~3 s, sin GPU ni datos):
+
+<div align="center">
+<img src="docs/captura_tests.png" alt="Salida de make test: 17 passed" width="760">
+</div>
+
+**El CLI entrena y evalúa** (mismos números que el cuaderno):
+
+<div align="center">
+<img src="docs/captura_cli.png" alt="Salida de python -m src.train y src.evaluate" width="780">
+</div>
+
+**La celda del cuaderno que guarda y recarga el modelo** (salida guardada en `IAdoc.ipynb`):
+
+<div align="center">
+<img src="docs/captura_notebook.png" alt="Celda 24 del cuaderno: exactitud del modelo recargado 0.835" width="700">
+</div>
+
+---
+
+## 🧱 Código reutilizable (`src/`)
+
+El cuaderno es la narrativa; `src/` es la versión que puedes importar y ejecutar.
+
+```text
+src/
+├── data.py       # loaders con las transformaciones exactas del cuaderno
+├── model.py      # CNNSencilla + ResNet-18 adaptada + pesos por clase
+├── engine.py     # entrenamiento, predicción, umbral, métricas
+├── train.py      # CLI de entrenamiento
+└── evaluate.py   # CLI de evaluación e inferencia de una imagen
+tests/            # 17 tests (formas, parámetros, métricas, umbral)
+```
+
+```bash
+make test                                    # 17 tests en ~3 s
+make train MODEL=cnn EPOCHS=15               # entrena y guarda el checkpoint
+make evaluate                                # métricas en el split de prueba
+
+# o sin make:
+python -m src.train --model cnn --epochs 1   # smoke test rápido
+python -m src.evaluate --checkpoint artifacts/modelo_cnn.pt --imagen rx.png
+```
+
+**Clasificar una imagen suelta** (con el aviso de siempre):
+
+```console
+$ python -m src.evaluate --checkpoint artifacts/modelo_cnn.pt --imagen rx.png
+
+Checkpoint: artifacts/modelo_cnn.pt | arquitectura: cnn
+Imagen: rx.png
+  Predicción: normal (51.0 %)
+  P(neumonía): 0.4895
+
+  Aviso: ejercicio educativo, sin validez clínica.
+```
+
+> [!NOTE]
+> `src/` **extrae** la lógica ya validada del cuaderno: no cambia arquitecturas,
+> hiperparámetros ni transformaciones. `tests/test_engine.py` lo comprueba reproduciendo
+> la matriz de confusión del README (TN=132, FP=102, FN=1, TP=389) a partir de esos conteos.
+
+---
+
 ## 📊 Resultados
 
 Conjunto de **prueba** (n = 624), umbral fijo **u = 0.50**, IC 95 % por bootstrap
@@ -389,13 +457,20 @@ IAMED/
 ├── IAdoc.ipynb          # Cuaderno principal (ejecutado en Colab, salidas incluidas)
 ├── README.md            # Este documento
 ├── MODEL_CARD.md        # Ficha del modelo: uso previsto, sesgos, limitaciones
+├── CITATION.cff         # Metadatos de citación (botón "Cite this repository")
+├── Makefile             # make test / train / evaluate
+├── pyproject.toml       # Configuración de ruff y pytest
 ├── requirements.txt     # Dependencias mínimas reproducibles
+├── requirements-dev.txt # Dependencias de desarrollo (pytest, ruff)
 ├── LICENSE              # MIT para el código
 ├── DATA_LICENSE.md      # Licencia de los datos (MedMNIST, CC BY 4.0)
 ├── .gitignore           # Artefactos, checkpoints y datos descargados
+├── src/                 # Código reutilizable (data, model, engine, train, evaluate)
+├── tests/               # 17 tests con pytest
+├── .github/workflows/   # CI: lint + tests + integridad del cuaderno
 ├── results/
 │   └── metrics.json     # Todas las métricas del cuaderno, legibles por máquina
-└── docs/                # Figuras extraídas de las salidas del cuaderno
+└── docs/                # Figuras y capturas extraídas de las salidas reales
 ```
 
 ---

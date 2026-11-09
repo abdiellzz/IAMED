@@ -1,0 +1,5 @@
+# Dependencias de desarrollo y CI (no necesarias para ejecutar el cuaderno).
+-r requirements.txt
+pytest>=7.4
+ruff>=0.4
+nbformat>=5.9
