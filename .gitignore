@@ -30,3 +30,10 @@ Thumbs.db
 # Entornos virtuales
 .venv/
 venv/
+
+# Artefactos de entrenamiento (checkpoints y metricas generadas)
+artifacts/
+
+# Caches de herramientas
+.pytest_cache/
+.ruff_cache/

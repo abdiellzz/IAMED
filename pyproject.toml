@@ -1,0 +1,23 @@
+[tool.ruff]
+line-length = 100
+target-version = "py39"
+
+[tool.ruff.lint]
+# Errores reales (F), imports (I), bugs comunes (B), y simplificaciones obvias (SIM).
+select = ["F", "E", "W", "I", "B"]
+ignore = [
+    "E501",  # longitud de línea: la controla el formateador
+]
+
+[tool.ruff.lint.per-file-ignores]
+"src/*.py" = ["B008"]      # argparse en funciones es idiomático
+"tests/*.py" = ["E402"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+# Permite `from src.model import ...` tanto con `pytest` como con `python -m pytest`.
+pythonpath = ["."]
+addopts = "-q"
+filterwarnings = [
+    "ignore::DeprecationWarning",
+]
