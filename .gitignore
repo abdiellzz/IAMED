@@ -1,0 +1,32 @@
+# Byte-compiled / cache
+__pycache__/
+*.py[cod]
+
+# Jupyter
+.ipynb_checkpoints/
+*/.ipynb_checkpoints/
+
+# Checkpoints de PyTorch
+# Nota: el cuaderno escribe modelo_cnn_pneumoniamnist.pt y modelo_automl.pt
+# (CNN: ~1 MB, ResNet-18: ~45 MB). Se regeneran al ejecutar el cuaderno, por lo
+# que no se versionan. Si en el futuro se quiere conservar un checkpoint final
+# pequeno, anadir una excepcion explicita, p. ej.:
+#   !modelo_cnn_pneumoniamnist.pt
+*.pt
+*.pth
+*.ckpt
+*.onnx
+
+# Datos descargados (MedMNIST guarda los .npz en ./datos_medmnist/)
+datos_medmnist/
+*.npz
+
+# Sistema operativo / editores
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Entornos virtuales
+.venv/
+venv/
