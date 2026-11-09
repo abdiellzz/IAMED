@@ -1,0 +1,144 @@
+{
+  "_descripcion": "Metricas del conjunto de prueba (n=624), copiadas literalmente de las salidas de IAdoc.ipynb. Ningun valor ha sido recalculado ni estimado. Ver README -> 'Trazabilidad de las cifras'.",
+  "_fuente": "IAdoc.ipynb (ejecutado en Google Colab, GPU Tesla T4)",
+  "conjunto_de_datos": {
+    "nombre": "PneumoniaMNIST",
+    "coleccion": "MedMNIST v2",
+    "resolucion": "28x28, escala de grises",
+    "split": {
+      "train": 4708,
+      "val": 524,
+      "test": 624
+    },
+    "desbalance_test": {
+      "normal": 234,
+      "pneumonia": 390
+    },
+    "referencia_trivial": {
+      "descripcion": "Modelo que siempre predice la clase mayoritaria (pneumonia)",
+      "exactitud": 0.625
+    }
+  },
+  "comparativa_test": {
+    "_nota": "Exactitud balanceada con umbral fijo u=0.50. IC95% por bootstrap con 2000 remuestras sobre el conjunto de prueba.",
+    "_celda": 37,
+    "modelos": {
+      "cnn_base": {
+        "auc": 0.959,
+        "bal_050": 0.781,
+        "ic95_bootstrap": [0.750, 0.813],
+        "exactitud": 0.835,
+        "sensibilidad": 0.997,
+        "especificidad": 0.564,
+        "f1": 0.883,
+        "brier": 0.1326,
+        "matriz_confusion": {
+          "tn": 132,
+          "fp": 102,
+          "fn": 1,
+          "tp": 389
+        }
+      },
+      "cnn_pesos": {
+        "auc": 0.968,
+        "bal_050": 0.848,
+        "ic95_bootstrap": [0.818, 0.878],
+        "exactitud": 0.883,
+        "sensibilidad": 0.987,
+        "especificidad": 0.709,
+        "brier": 0.0964
+      },
+      "automl_optuna": {
+        "auc": 0.969,
+        "bal_050": 0.892,
+        "ic95_bootstrap": [0.866, 0.918]
+      },
+      "resnet18": {
+        "auc": 0.976,
+        "bal_050": 0.869,
+        "ic95_bootstrap": [0.841, 0.897],
+        "_nota": "El cuaderno imprime 0.868 en la celda de ResNet-18 y 0.869 en la comparativa final; aqui se registra la comparativa (celda 37), que es la que alimenta el bootstrap."
+      }
+    }
+  },
+  "mcnemar_test": {
+    "_nota": "Test binomial exacto de dos colas, umbral u=0.50, mismo conjunto de prueba. Bonferroni para 3 comparaciones: alpha=0.0167.",
+    "_celda": 38,
+    "comparaciones": [
+      {
+        "a": "automl_optuna",
+        "b": "resnet18",
+        "acierta_solo_a": 22,
+        "acierta_solo_b": 14,
+        "p_valor": 0.2430,
+        "significativo": false
+      },
+      {
+        "a": "cnn_pesos",
+        "b": "resnet18",
+        "acierta_solo_a": 13,
+        "acierta_solo_b": 23,
+        "p_valor": 0.1325,
+        "significativo": false
+      },
+      {
+        "a": "automl_optuna",
+        "b": "cnn_pesos",
+        "acierta_solo_a": 24,
+        "acierta_solo_b": 6,
+        "p_valor": 0.0014,
+        "significativo": true,
+        "significativo_tras_bonferroni": true
+      }
+    ]
+  },
+  "transferencia_de_umbral": {
+    "_nota": "Umbral elegido SOLO en validacion y aplicado despues en prueba. Evidencia de distribution shift entre splits.",
+    "automl_optuna": {
+      "umbral_val": 0.12,
+      "bal_test_u050": 0.892,
+      "bal_test_u_val": 0.852,
+      "delta": -0.040
+    },
+    "resnet18": {
+      "umbral_val": 0.33,
+      "bal_test_u050": 0.869,
+      "bal_test_u_val": 0.848,
+      "delta": -0.021
+    },
+    "cnn_pesos": {
+      "umbral_val": 0.74,
+      "bal_test_u050": 0.848,
+      "bal_test_u_val": 0.876,
+      "delta": 0.028,
+      "_nota": "Unico caso que mejora: la direccion del efecto no es unanime."
+    }
+  },
+  "variabilidad_entre_semillas": {
+    "_nota": "CNN pequena, 3 semillas (42, 7, 123). Media +- desviacion tipica.",
+    "_celda": 28,
+    "sin_pesos": {
+      "auc": "0.966 +- 0.005",
+      "bal_050": "0.781 +- 0.016",
+      "bal_umbral_optimo": "0.846 +- 0.016"
+    },
+    "con_pesos": {
+      "auc": "0.967 +- 0.005",
+      "bal_050": "0.829 +- 0.018",
+      "bal_umbral_optimo": "0.853 +- 0.021"
+    }
+  },
+  "automl": {
+    "_celda": 31,
+    "n_pruebas_optuna": 25,
+    "epocas_por_prueba": 8,
+    "mejores_hiperparametros": {
+      "lr": 0.0007309539835912913,
+      "dropout": 0.14561457009902096,
+      "peso_minoritaria": 2.223705789444759
+    },
+    "bal_validacion": 0.978,
+    "bal_test_mismo_umbral": 0.852,
+    "_nota": "La brecha 0.978 -> 0.852 sugiere sobreajuste a la validacion (25 intentos sobre 524 imagenes)."
+  }
+}

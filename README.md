@@ -11,6 +11,8 @@
 > para diagnosticar, descartar ni priorizar** a ningún paciente. Se entrenan con
 > imágenes de **28 × 28 píxeles** procedentes de un único conjunto de datos público,
 > sin validación externa ni prospectiva.
+>
+> Ficha completa de uso, sesgos y limitaciones: [`MODEL_CARD.md`](MODEL_CARD.md)
 
 ---
 
@@ -49,7 +51,7 @@ fallos metodológicos encontrados.
 Conjunto de **prueba** (n = 624). Exactitud balanceada con **umbral fijo u = 0.50**.
 Intervalos de confianza al 95 % por **bootstrap** (2 000 remuestras sobre el conjunto de
 prueba). Todos los valores están copiados de las salidas reales del cuaderno
-(`IAdoc.ipynb`, celdas 36 y 37).
+(`IAdoc.ipynb`, celdas 37 y 38).
 
 | Modelo | AUC | Exact. bal. (u = 0.50) | IC 95 % bootstrap |
 |---|---|---|---|
@@ -59,7 +61,7 @@ prueba). Todos los valores están copiados de las salidas reales del cuaderno
 | ResNet-18 | **0.976** | 0.869 | [0.841 – 0.897] |
 
 > Nota de transparencia: el cuaderno imprime **0.868** para ResNet-18 en su sección propia
-> (celda 34) y **0.869** en la comparativa final (celda 36). Esta tabla usa la salida de la
+> (celda 35) y **0.869** en la comparativa final (celda 37). Esta tabla usa la salida de la
 > comparativa final, que es también la que alimenta el bootstrap y McNemar; la diferencia de
 > una milésima proviene de las dos salidas del cuaderno y no se ha retocado.
 
@@ -70,6 +72,18 @@ prueba). Todos los valores están copiados de las salidas reales del cuaderno
 | AutoML vs ResNet-18 | 22 | 14 | **0.2430** | No significativo |
 | CNN + pesos vs ResNet-18 | 13 | 23 | **0.1325** | No significativo |
 | AutoML vs CNN + pesos | 24 | 6 | **0.0014** | Significativo (también con Bonferroni α = 0.0167) |
+
+![Curvas ROC comparativas en el conjunto de prueba](docs/fig_roc_comparativa.png)
+
+*Curvas ROC de los cuatro modelos sobre las mismas 624 imágenes de prueba. Las AUC están
+comprimidas en la esquina superior izquierda: a esta resolución las cuatro curvas son casi
+indistinguibles, que es exactamente la conclusión del trabajo (los IC 95 % se solapan).*
+
+![Matriz de confusión de la CNN base](docs/fig_matriz_confusion.png)
+
+*Matriz de confusión de la CNN base (u = 0.50). Los 102 falsos positivos frente a 1 solo
+falso negativo explican su especificidad de 0.564 y por qué la exactitud balanceada es la
+métrica principal, no la exactitud.*
 
 ### Métricas complementarias (CNN, u = 0.50, prueba)
 
@@ -99,16 +113,19 @@ Cada número de este README proviene de una salida del cuaderno, no de una estim
 
 | Cifra | Celda del cuaderno |
 |---|---|
-| Tamaños de split y desbalance | 7, 11 |
-| Métricas de la CNN base (exactitud, sens., espec., F1) | 19 |
-| AUC y umbrales de validación | 24 |
-| Comparación CNN sin/con pesos, umbral óptimo | 25 |
-| Brier score y calibración | 26 |
-| Variabilidad entre semillas | 27 |
-| Optuna, hiperparámetros ganadores y métricas finales | 30 |
-| ResNet-18 (AUC, bal. a u = 0.50 y u = 0.33) | 34 |
-| Tabla comparativa + IC 95 % bootstrap | 36 |
-| Test de McNemar | 37 |
+| Tamaños de split y desbalance | 8, 12 |
+| Métricas de la CNN base (exactitud, sens., espec., F1) | 20 |
+| AUC y umbrales de validación | 25 |
+| Comparación CNN sin/con pesos, umbral óptimo | 26 |
+| Brier score y calibración | 27 |
+| Variabilidad entre semillas | 28 |
+| Optuna, hiperparámetros ganadores y métricas finales | 31 |
+| ResNet-18 (AUC, bal. a u = 0.50 y u = 0.33) | 35 |
+| Tabla comparativa + IC 95 % bootstrap | 37 |
+| Test de McNemar | 38 |
+
+(Los índices corresponden a `IAdoc.ipynb` tal como está en este repositorio, contando la
+celda Markdown de cabecera como celda 0.)
 
 ---
 
@@ -240,14 +257,34 @@ IAMED/
 ├── IAdoc.ipynb          # Cuaderno principal (ejecutado en Colab, salidas incluidas)
 ├── README.md            # Este documento
 ├── requirements.txt     # Dependencias mínimas reproducibles
+├── MODEL_CARD.md        # Ficha del modelo (uso previsto, sesgos, limitaciones)
 ├── LICENSE              # MIT para el código (los datos tienen su propia licencia)
-└── .gitignore           # Artefactos, checkpoints y datos descargados
+├── .gitignore           # Artefactos, checkpoints y datos descargados
+├── results/
+│   └── metrics.json     # Todas las métricas del cuaderno, en formato legible por máquina
+└── docs/                # Figuras extraídas de las salidas del cuaderno
 ```
 
 **Contenido del cuaderno:** exploración de datos y visualización → *baseline* CNN →
 métricas y matriz de confusión → guardado/carga del modelo → pérdida ponderada por clase →
 curvas ROC y calibración → variabilidad entre semillas → AutoML con Optuna → ResNet-18 con
 ajuste fino → comparativa con bootstrap y McNemar → discusión y conclusiones.
+
+---
+
+## Verificar las cifras sin reentrenar
+
+Todas las métricas de este README están volcadas en [`results/metrics.json`](results/metrics.json),
+copiadas literalmente de las salidas del cuaderno. Puedes comprobarlas sin GPU ni
+entrenamiento:
+
+```bash
+python -c "import json; m=json.load(open('results/metrics.json')); \
+print(m['comparativa_test']['modelos']['resnet18'])"
+```
+
+Las figuras de `docs/` están extraídas directamente de las salidas guardadas en
+`IAdoc.ipynb`: son las que produjo la ejecución original, no recreaciones.
 
 ---
 
