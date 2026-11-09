@@ -5,7 +5,7 @@
 ![PyTorch](https://img.shields.io/badge/PyTorch-2.x-EE4C2C)
 ![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)
 
-> ## ⚠️ No tiene validez clínica
+> ##  No tiene validez clínica
 > Este repositorio es un **ejercicio educativo y retrospectivo**. Los modelos aquí
 > descritos **no son dispositivos médicos**, **no están validados** y **no deben usarse
 > para diagnosticar, descartar ni priorizar** a ningún paciente. Se entrenan con
